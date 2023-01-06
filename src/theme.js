@@ -7,13 +7,18 @@ export default createTheme({
         },
         primary:{
             main: "#14194c",
-        }
+        },
+        pink:'linear-gradient(138.72deg, #dc8295 0%, #dc687c 95.83%)'
     },
     typography:{
         fontFamily:'Mulish, sans-serif',
         h4: {
             fontWeight: 800
+        },
+        h5: {
+            fontWeight: 800
         }
+
 
     }
 })
