@@ -1,5 +1,5 @@
 import React, { useEffect, useState, Fragment } from 'react';
-import { Stack, Typography, Box, IconButton, Divider } from '@mui/material';
+import { Stack, Typography, Box, IconButton, Divider, CircularProgress, Button } from '@mui/material';
 import { ArrowBack, BookmarkBorder, PlayArrow } from '@mui/icons-material';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -8,24 +8,52 @@ const Defination = () => {
   const { word } = useParams();
   const navigate = useNavigate();
   const [definitions, setDefinitions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [exist, setExist] = useState(true);
 
   useEffect(() => {
     const fetchDef = async () => {
+     try {    
       const resp = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${word}`);
       setDefinitions(resp.data);
+      setLoading(false);
+    } catch (error) {
+      setExist(false);
     }
+  }
     fetchDef();
-  }, [])
+  },[])
+
+  if(!exist) return <Box sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh'
+  }}> 
+  <Typography> Word Not Found</Typography>
+  <Button variant='contained' sx={{textTransform:'capitalize', mt:2}} onClick={() => navigate(-1)}>Go back</Button>
+  </Box>
+
+  if (loading) return <Box sx={{
+    display: 'flex',
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: '100vh'
+  }}> 
+  <CircularProgress />
+  </Box>
 
 
   return (
     <>
       <Stack direction="row" justifyContent="space-between">
         <IconButton onClick={() => navigate(-1)}>
-          <ArrowBack />
+          <ArrowBack sx={{color:'black'}}/>
         </IconButton>
         <IconButton>
-          <BookmarkBorder />
+          <BookmarkBorder sx={{color:'black'}}/>
         </IconButton>
       </Stack>
       <Stack direction="row" alignItems="center" justifyContent="space-between" sx={{
@@ -52,17 +80,17 @@ const Defination = () => {
       </Stack>
       {definitions.map((def, idx) =>
         <Fragment key={idx}>
-          <Divider sx={{ display:idx === 0 ? 'none' : 'block', my:3}}/>
+          <Divider sx={{ display: idx === 0 ? 'none' : 'block', my: 3 }} />
           {def.meanings.map(meaning =>
             <Box key={meaning.partOfSpeech} sx={{
               backgroundColor: 'white',
               borderRadius: 2,
               boxShadow: '0px 10px 25px rgba(0,0,0,0.05)',
               p: 2,
-              mt:3
+              mt: 3
             }}>
-              <Typography sx={{textTransform:'capitalize'}} variant='subtitle1' color="GrayText">{meaning.partOfSpeech}</Typography>
-             {meaning.definitions.map((definition,idx) => <Typography key={definition} variant='body2' sx={{textTransform:'capitalize',my:1}} color="GrayText">{meaning.definitions.length > 1 && `${idx + 1}.`}{definition.definition}</Typography>)}
+              <Typography sx={{ textTransform: 'capitalize' }} variant='subtitle1' color="GrayText">{meaning.partOfSpeech}</Typography>
+              {meaning.definitions.map((definition, idx) => <Typography key={definition} variant='body2' sx={{ textTransform: 'capitalize', my: 1 }} color="GrayText">{meaning.definitions.length > 1 && `${idx + 1}.`}{definition.definition}</Typography>)}
             </Box>
           )}
         </Fragment>
